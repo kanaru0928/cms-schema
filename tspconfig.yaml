@@ -5,7 +5,7 @@ options:
   "@typespec/openapi3":
     emitter-output-dir: "{output-dir}/schema"
     openapi-versions:
-      - 3.1.0
+      - "3.0.0"
 # entrypoint: main.tsp                           # Main TypeSpec file (default: main.tsp)
 # extends: ../tspconfig.yaml                     # Extend another config file
 # emit:                                          # Emitter name
