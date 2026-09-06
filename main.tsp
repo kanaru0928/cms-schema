@@ -4,12 +4,8 @@ import "@typespec/openapi";
 using Http;
 using OpenAPI;
 
-@service(#{
-  title: "Kanaru.me API",
-})
-@info(#{
-  version: "2.0.0",
-})
+@service(#{ title: "Kanaru.me API" })
+@info(#{ version: "2.0.0" })
 @doc("Kanaru.me のバックエンドAPIドキュメント")
 namespace KanaruMeAPI;
 
@@ -81,36 +77,50 @@ interface Articles {
   list(
     @query tag?: string,
     @query status?: ArticleStatus,
-    @query @minValue(1) @maxValue(100) limit?: int32,
+
+    @query
+    @minValue(1)
+    @maxValue(100)
+    limit?: int32,
+
     @query order?: SortOrder,
-  ): ArticleMetadata[] | InternalServerErrorResponse;
+  ): ArticleMetadata[] | InternalServerErrorResponse | UnauthorizedResponse;
 
   @get
   @route("{slug}")
   @summary("記事詳細を取得")
   @doc("指定されたスラッグの記事詳細を取得します")
-  read(@path @minLength(1) slug: string): ArticleDetail | NotFoundResponse | InternalServerErrorResponse;
+  read(@path @minLength(1) slug: string):
+    | ArticleDetail
+    | NotFoundResponse
+    | InternalServerErrorResponse
+    | UnauthorizedResponse;
 
   @delete
   @route("{slug}")
   @useAuth(BearerAuth)
   @summary("記事を削除")
   @doc("指定されたスラッグの記事を削除します（要認証）")
-  delete(
-    @path @minLength(1) slug: string,
-  ): DeleteSuccess | UnauthorizedResponse | NotFoundResponse | InternalServerErrorResponse;
+  delete(@path @minLength(1) slug: string):
+    | DeleteSuccess
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse;
 
   @put
   @route("{slug}")
   @useAuth(BearerAuth)
   @summary("記事を作成または更新")
   @doc("記事が存在しない場合は新規作成、存在する場合は全体を更新します（要認証）")
-  upsert(
-    @path @minLength(1) slug: string,
-    @body body: UpsertTextArticle,
-  ):
-    | { @statusCode statusCode: 200; @body body: ArticleMetadata }
-    | { @statusCode statusCode: 201; @body body: ArticleMetadata }
+  upsert(@path @minLength(1) slug: string, @body body: UpsertTextArticle):
+    | {
+        @statusCode statusCode: 200;
+        @body body: ArticleMetadata;
+      }
+    | {
+        @statusCode statusCode: 201;
+        @body body: ArticleMetadata;
+      }
     | UnauthorizedResponse
     | InternalServerErrorResponse;
 }
