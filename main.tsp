@@ -63,6 +63,11 @@ model UnauthorizedResponse {
   @body body: Error;
 }
 
+model ValidationErrorResponse {
+  @statusCode statusCode: 422;
+  @body body: Error;
+}
+
 model InternalServerErrorResponse {
   @statusCode statusCode: 500;
   @body body: Error;
@@ -84,7 +89,11 @@ interface Articles {
     limit?: int32,
 
     @query order?: SortOrder,
-  ): ArticleMetadata[] | InternalServerErrorResponse | UnauthorizedResponse;
+  ):
+    | ArticleMetadata[]
+    | InternalServerErrorResponse
+    | UnauthorizedResponse
+    | ValidationErrorResponse;
 
   @get
   @route("{slug}")
@@ -94,7 +103,8 @@ interface Articles {
     | ArticleDetail
     | NotFoundResponse
     | InternalServerErrorResponse
-    | UnauthorizedResponse;
+    | UnauthorizedResponse
+    | ValidationErrorResponse;
 
   @delete
   @route("{slug}")
@@ -105,7 +115,8 @@ interface Articles {
     | DeleteSuccess
     | UnauthorizedResponse
     | NotFoundResponse
-    | InternalServerErrorResponse;
+    | InternalServerErrorResponse
+    | ValidationErrorResponse;
 
   @put
   @route("{slug}")
@@ -122,5 +133,6 @@ interface Articles {
         @body body: ArticleMetadata;
       }
     | UnauthorizedResponse
-    | InternalServerErrorResponse;
+    | InternalServerErrorResponse
+    | ValidationErrorResponse;
 }
