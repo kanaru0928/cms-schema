@@ -49,7 +49,7 @@ model UpsertTextArticle {
   @minLength(1) contentBody: string;
   @minLength(1) @maxLength(100) source: string;
   status: ArticleStatus;
-  tags?: string[] = #[];
+  @minItems(1) tags: string[];
   @minLength(1) @maxLength(2000) thumbnailUrl: string;
 }
 
