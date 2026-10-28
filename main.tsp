@@ -77,6 +77,7 @@ model InternalServerErrorResponse {
 @tag("Articles")
 interface Articles {
   @get
+  @useAuth(BearerAuth | NoAuth)
   @summary("記事一覧を取得")
   @doc("記事の一覧を取得します。認証されていない場合は公開済み記事のみ返却されます。")
   list(
@@ -97,8 +98,9 @@ interface Articles {
 
   @get
   @route("{slug}")
+  @useAuth(BearerAuth | NoAuth)
   @summary("記事詳細を取得")
-  @doc("指定されたスラッグの記事詳細を取得します")
+  @doc("指定されたスラッグの記事詳細を取得します。認証されていない場合、非公開記事は存在しないものとして扱われます。")
   read(@path @minLength(1) slug: string):
     | ArticleDetail
     | NotFoundResponse
