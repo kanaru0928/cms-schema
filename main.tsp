@@ -57,6 +57,24 @@ model UpsertTextArticle {
   @minLength(1) @maxLength(2000) thumbnailUrl: string;
 }
 
+union ThumbnailContentType {
+  png: "image/png",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+}
+
+model CreateThumbnailUploadUrl {
+  contentType: ThumbnailContentType;
+}
+
+model ThumbnailUploadUrl {
+  @doc("アップロード先の署名付き URL。`PUT` で `Content-Type` を指定してアップロードします")
+  uploadUrl: string;
+
+  @doc("アップロード後に配信されるパス")
+  url: string;
+}
+
 model NotFoundResponse {
   @statusCode statusCode: 404;
   @body body: Error;
@@ -138,6 +156,21 @@ interface Articles {
         @statusCode statusCode: 201;
         @body body: ArticleMetadata;
       }
+    | UnauthorizedResponse
+    | InternalServerErrorResponse
+    | ValidationErrorResponse;
+}
+
+@route("/api/thumbnails")
+@tag("Thumbnails")
+interface Thumbnails {
+  @post
+  @route("upload-url")
+  @useAuth(KcmsAuth)
+  @summary("サムネイルのアップロード URL を発行")
+  @doc("サムネイル画像をアップロードするための署名付き URL を発行します（要認証）")
+  createUploadUrl(@body body: CreateThumbnailUploadUrl):
+    | ThumbnailUploadUrl
     | UnauthorizedResponse
     | InternalServerErrorResponse
     | ValidationErrorResponse;
