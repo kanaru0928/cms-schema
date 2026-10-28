@@ -35,6 +35,10 @@ model ArticleDetail extends ArticleMetadata {
   content: string;
 }
 
+// CloudFront の OAC が Authorization ヘッダーを署名で上書きするため、独自ヘッダーで Bearer トークンを受け取る
+@doc("`Bearer <token>` の形式で Cognito のトークンを指定します")
+model KcmsAuth is ApiKeyAuth<ApiKeyLocation.header, "KCMS-Authorization">;
+
 @error
 model Error {
   error: string;
@@ -77,7 +81,7 @@ model InternalServerErrorResponse {
 @tag("Articles")
 interface Articles {
   @get
-  @useAuth(BearerAuth | NoAuth)
+  @useAuth(KcmsAuth | NoAuth)
   @summary("記事一覧を取得")
   @doc("記事の一覧を取得します。認証されていない場合は公開済み記事のみ返却されます。")
   list(
@@ -98,7 +102,7 @@ interface Articles {
 
   @get
   @route("{slug}")
-  @useAuth(BearerAuth | NoAuth)
+  @useAuth(KcmsAuth | NoAuth)
   @summary("記事詳細を取得")
   @doc("指定されたスラッグの記事詳細を取得します。認証されていない場合、非公開記事は存在しないものとして扱われます。")
   read(@path @minLength(1) slug: string):
@@ -110,7 +114,7 @@ interface Articles {
 
   @delete
   @route("{slug}")
-  @useAuth(BearerAuth)
+  @useAuth(KcmsAuth)
   @summary("記事を削除")
   @doc("指定されたスラッグの記事を削除します（要認証）")
   delete(@path @minLength(1) slug: string):
@@ -122,7 +126,7 @@ interface Articles {
 
   @put
   @route("{slug}")
-  @useAuth(BearerAuth)
+  @useAuth(KcmsAuth)
   @summary("記事を作成または更新")
   @doc("記事が存在しない場合は新規作成、存在する場合は全体を更新します（要認証）")
   upsert(@path @minLength(1) slug: string, @body body: UpsertTextArticle):
