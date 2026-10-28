@@ -58,17 +58,19 @@ model UpsertTextArticle {
 }
 
 union ThumbnailContentType {
-  png: "image/png",
-  jpeg: "image/jpeg",
   webp: "image/webp",
 }
 
 model CreateThumbnailUploadUrl {
   contentType: ThumbnailContentType;
+
+  @doc("画像の MD5 ハッシュ（16 進数）")
+  @pattern("^[0-9a-f]{32}$")
+  md5: string;
 }
 
 model ThumbnailUploadUrl {
-  @doc("アップロード先の署名付き URL。`PUT` で `Content-Type` を指定してアップロードします")
+  @doc("アップロード先の署名付き URL。`PUT` で `Content-Type` と `Content-MD5` を指定してアップロードします")
   uploadUrl: string;
 
   @doc("アップロード後に配信されるパス")
